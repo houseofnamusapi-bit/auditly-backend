@@ -2,8 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const { runAudit } = require("./playwright/audit");
-
+const { deleteAuditScreenshots } = require("./utils/cleanupAudit");
 const app = express();
+
+require("./cleanupJob");
+
 
 /* ✅ CORS — MUST BE BEFORE ROUTES */
 app.use(
@@ -41,4 +44,12 @@ app.post("/api/audit", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
+});
+
+app.post("/api/audit/cleanup", (req, res) => {
+  const { auditId } = req.body;
+
+  deleteAuditScreenshots(auditId);
+
+  res.json({ success: true });
 });
